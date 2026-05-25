@@ -1,0 +1,121 @@
+site_name: СМ ГОЗ Opensource
+site_url: https://psb-share.pages.headoffice.psbank.local/information-technology-block/smgoz/opensource
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/link
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch-off
+        name: Switch to system preference
+  font:
+    text: Roboto
+    code: Roboto Mono
+  features:
+    - content.action.edit
+    - content.code.annotate
+    - content.code.copy
+    - content.tooltips
+    - navigation.footer
+    - navigation.indexes
+    - navigation.instant
+    - navigation.sections
+    - navigation.tabs
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+
+plugins:
+  - search:
+      lang: ru
+      separator: '[\s​\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+nav:
+  - Главная: index.md
+  - Аудит:
+    - home/Audit/AppExt.md
+    - home/Audit/AuthProvider.md
+    - home/Audit/Front-Web.md
+    - home/Audit/Kafka-app.md
+    - home/Audit/Loginom.md
+    - home/Audit/Opensearch.md
+    - home/Audit/Storage.md
+    - home/Audit/VectorALL.md
+  - Мониторинг: home/Monitoring.md
+  - Backlog: home/Backlog.md
+  - Keycloak:
+    - home/Keycloak/X509-Authentication.md
+  - OpenSearch:
+    - home/Opensearch/Monitors.md
+    - home/Opensearch/Обновление-кластера.md
+  - Vector:
+    - home/Vector/Logging-v2.md
+  - Организация:
+    - home/ОргРаздел/Группы_и_ТУЗ_Opensource.md
+    - home/ОргРаздел/Дежурства.md
+  - Шпаргалка:
+    - home/Шпаргалка/AppVSContour.md
+    - home/Шпаргалка/bash.md
+    - home/Шпаргалка/ceph.md
+    - home/Шпаргалка/Consul.md
+    - home/Шпаргалка/kafka.md
+    - home/Шпаргалка/Opensearch.md
+    - home/Шпаргалка/Включить-репозиторий-latest.md
+    - home/Шпаргалка/Установка-intelliJ-IDEA-(RedOS).md
+    - home/Шпаргалка/Установка-postman-(RedOS).md

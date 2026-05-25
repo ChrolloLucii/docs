@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp -r \"C:/Users/jammbeast/Documents/docs/docs.wiki/.\" \"C:/Users/jammbeast/Documents/docs/docs-UTS-1993883-docs-material/docs/\")",
+      "Bash(cp -r \"C:/Users/jammbeast/Documents/docs/docs-UTS-1993883-docs-material/stylesheets\" \"C:/Users/jammbeast/Documents/docs/docs-UTS-1993883-docs-material/docs/stylesheets\")",
+      "Bash(pip install *)",
+      "Bash(mkdocs build *)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(curl -s https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/mkdocs.yml)",
+      "Bash(curl -s https://api.github.com/repos/squidfunk/mkdocs-material/contents/docs)",
+      "Bash(python3 -c \"import sys,json; [print\\(x['name'], x['type']\\) for x in json.load\\(sys.stdin\\) if isinstance\\(x, dict\\)]\")",
+      "Bash(curl *)"
+    ]
+  }
+}

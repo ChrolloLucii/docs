@@ -1,0 +1,41 @@
+variables: 
+  WIKI_DIR: "wiki"
+  WIKI_PROJECT_PATH: "psb-private/devops-infrastructure/opensource-admins/projects/smgoz/docs"
+  ANSIBLE_IMAGE: nexus-internal:6003/usmpo/oassok/build-base-infra-images/ansible-run:redos-7.3.4-int-v19
+  RUNNER_TAG: smgoz_docs_for_pages
+
+default:
+  image: ${ANSIBLE_IMAGE}
+  tags:
+    - ${RUNNER_TAG}
+
+stages: 
+  - pages
+
+pages:
+  stage: pages
+  script:
+    - |
+      # Настройка pip
+      cat <<EOF > /etc/pip.conf
+      [global]
+      timeout = 3600
+      trusted-host = nexus-external.psbnk.msk.ru nexus-internal.headoffice.psbank.local
+      index = https://nexus-external.psbnk.msk.ru/repository/pypi.org-group/simple/
+      index-url = https://nexus-external.psbnk.msk.ru/index/python/simple
+      extra-index-url = https://nexus-internal.headoffice.psbank.local/repository/devops-python-packages/simple
+      EOF
+      export PATH=${PATH}:/home/redos/.local/bin
+      python3 -m pip install "jinja2<3.1.0"
+      python3 -m pip install "pygments<2.12" "pymdown-extensions>=9.0" "mkdocs-material==8.2.1"
+      git clone --depth 1 https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${WIKI_PROJECT_PATH}.wiki.git $WIKI_DIR
+      find ./$WIKI_DIR -name "*.md" -exec sed -i 's#(uploads#(/devops-infrastructure/opensource-admins/projects/smgoz/docs/uploads#g' {} \;
+      mkdir $CI_PROJECT_DIR/docs
+      cp -r $CI_PROJECT_DIR/$WIKI_DIR/* $CI_PROJECT_DIR/docs
+      cp -r $CI_PROJECT_DIR/stylesheets $CI_PROJECT_DIR/docs
+      mv $CI_PROJECT_DIR/docs/{home,index}.md
+      python3 $CI_PROJECT_DIR/script/convert.py
+      python3 -m mkdocs build --site-dir $CI_PROJECT_DIR/public
+  artifacts:
+    paths:
+      - public
