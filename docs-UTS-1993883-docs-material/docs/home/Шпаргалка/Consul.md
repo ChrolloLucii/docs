@@ -1,79 +1,87 @@
-:red_circle: Дерегистрация сервиса
+# Consul: дерегистрация сервиса
 
-Для того, чтобы сработала дерегистрация, нужно помнить 3 вещи.
+## Важно перед дерегистрацией
 
-1) Чтобы сработала дерегистрация сервис должен быть в статусе critical ( не должен проходить healthcheck)
-2) Производить дерегистрацию надо с агента, с которого был зарегистрирован сервис
-3) Дерегистрируется сервис по Service ID, а не по имени сервиса
+1. Сервис должен быть в статусе `critical` (healthcheck не проходит).
+2. Дерегистрация выполняется с агента, который регистрировал сервис.
+3. Дерегистрация идет по **Service ID**, а не по имени сервиса.
 
-Подготовка в дерегистрации
+## Как получить Service ID
 
-Первый способ через Web UI
+### Через Web UI
 
-Открываете services ----\> кликаете на имя сервиса ---\> И там будет 2 сервиса на разных нодах. Вот название сервиса и порт на конце и есть Service ID.
+Откройте `Services` -> выберите сервис -> найдите две записи на разных нодах. Название сервиса и порт в конце — это Service ID.
 
-Второй способ через клиент.
+### Через API (catalog)
 
-:red_circle: Посмотреть список всех сервисов
-
-```bash
-curl -H "X-consul-Token: bootstrap токен" --cert "/srv/consul/ssl/$(hostname -s).cer" --key "/srv/consul/ssl/$(hostname -s).key" --cacert "/srv/consul/ssl/root.cer" https://smgoz-cn-ift1:8501/v1/catalog/services/?pretty 
-```
-
-:red_circle:Посмотреть статус сервиса и service-id
+Список сервисов:
 
 ```bash
-curl -H "X-consul-Token: bootstrap токен" --cert "/srv/consul/ssl/$(hostname -s).cer" --key "/srv/consul/ssl/$(hostname -s).key" --cacert "/srv/consul/ssl/root.cer" https://smgoz-cn-ift1:8501/v1/catalog/service/psb-smgoz-jvm-service-authorization?pretty`
+curl -H "X-consul-Token: bootstrap токен" \
+    --cert "/srv/consul/ssl/$(hostname -s).cer" \
+    --key "/srv/consul/ssl/$(hostname -s).key" \
+    --cacert "/srv/consul/ssl/root.cer" \
+    https://smgoz-cn-ift1:8501/v1/catalog/services/?pretty
 ```
 
-где psb-smgoz-jvm-service-authorization - имя сервиса
+Статус сервиса и Service ID:
 
-В выводе нас интересует Service ID
+```bash
+curl -H "X-consul-Token: bootstrap токен" \
+    --cert "/srv/consul/ssl/$(hostname -s).cer" \
+    --key "/srv/consul/ssl/$(hostname -s).key" \
+    --cacert "/srv/consul/ssl/root.cer" \
+    https://smgoz-cn-ift1:8501/v1/catalog/service/psb-smgoz-jvm-service-authorization?pretty
+```
 
-Пример вывода
+Пример фрагмента ответа:
 
 ```json
-    {
-        "ID": "secret",
-        "Node": "smgoz-app-ift5.headoffice.psbank.local",
-        "Address": "secret",
-        "Datacenter": "smgoz-ift",
-        "TaggedAddresses": {
-            "lan": "secret",
-            "lan_ipv4": "secret",
-            "wan": "secret",
-            "wan_ipv4": "secret"
-        },
-        "NodeMeta": {
-            "consul-network-segment": "",
-            "consul-version": "1.20.1"
-        },
-        "ServiceKind": "",
-        "ServiceID": "psb-smgoz-jvm-service-authorization-38090",
-        "ServiceName": "psb-smgoz-jvm-service-authorization"
+{
+    "ID": "secret",
+    "Node": "smgoz-app-ift5.headoffice.psbank.local",
+    "Address": "secret",
+    "Datacenter": "smgoz-ift",
+    "TaggedAddresses": {
+        "lan": "secret",
+        "lan_ipv4": "secret",
+        "wan": "secret",
+        "wan_ipv4": "secret"
+    },
+    "NodeMeta": {
+        "consul-network-segment": "",
+        "consul-version": "1.20.1"
+    },
+    "ServiceKind": "",
+    "ServiceID": "psb-smgoz-jvm-service-authorization-38090",
+    "ServiceName": "psb-smgoz-jvm-service-authorization"
 }
 ```
 
-:red_circle: Тут самый сок, чтобы дерегистрировать сервис, ему нужен write на Service ID. То есть нам нужно давать write не только на service name, но и на service ID
-
-Перед этим делаем
+## Экспорт переменных
 
 ```bash
 export CONSUL_CACERT="/srv/consul/ssl/root.cer"
 export CONSUL_CLIENT_CERT="/srv/consul/ssl/$(hostname -s).cer"
 export CONSUL_CLIENT_KEY="/srv/consul/ssl/$(hostname -s).key"
-export CONSUL_HTTP_TOKEN="лучше bootstrap токен или токен с write на service-id"
-export CONSUL_HTTP_ADDR="https://$(hostname):8501" ( тут имя консул сервера именно)
+export CONSUL_HTTP_TOKEN="bootstrap токен или токен с write на service-id"
+export CONSUL_HTTP_ADDR="https://$(hostname):8501"
 ```
 
-:red_circle: Выполняем саму команду дерегистрации :smiley_cat:
+## Дерегистрация
+
+Через CLI (может не сработать):
 
 ```bash
-consul services deregister -id psb-smgoz-jvm-service-authorization-38090 # может не работать
+consul services deregister -id psb-smgoz-jvm-service-authorization-38090
 ```
 
-Точно работает curl
+Надежный вариант через API:
 
 ```bash
-curl -X PUT -H "X-consul-Token: bootstrap" --cert "/etc/consul/ssl/$(hostname -s).cer" --key "/etc/consul/ssl/$(hostname -s).key" --cacert "/etc/consul/ssl/root.cer" https://имя ноды, на котрой сервис:8501/v1/agent/service/deregister/ServiceID нужного сервиса
+curl -X PUT -H "X-consul-Token: bootstrap" \
+    --cert "/etc/consul/ssl/$(hostname -s).cer" \
+    --key "/etc/consul/ssl/$(hostname -s).key" \
+    --cacert "/etc/consul/ssl/root.cer" \
+    https://<node>:8501/v1/agent/service/deregister/<service-id>
 ```

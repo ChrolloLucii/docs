@@ -1,43 +1,43 @@
-# 100780 ИЗ СМ ГОЗ Инструкция по включению сбора логов для нового микросервиса
+# Logging v2: включение сбора логов для нового микросервиса
+
+Инструкция для проекта 100780 ИЗ СМ ГОЗ по подключению логов микросервисов.
 
 ## Необходимая информация
 
-* Название логической группы, в которую входит новый микросервис.
-* Название микросервиса в точности соответствующее названию контейнера Docker, в котором будет запущен микросервис без численного суффикса инстанса, если таковой имеется.
+- Название логической группы, в которую входит микросервис.
+- Название микросервиса, совпадающее с контейнером Docker (без численного суффикса, если он есть).
 
 ## Логические группы микросервисов
 
-Название топика логов логической группы всегда формируется по формуле: `<contour>-microservices-logs.<group>`, где:
+Название топика логов формируется по формуле: `<contour>-microservices-logs.<group>`, где:
 
-* \- аббревиатура контура на проекте 100780 ИЗ СМ ГОЗ
-* \- название логической группы микросервиса
+- `<contour>` — аббревиатура контура.
+- `<group>` — логическая группа микросервиса.
 
-### Перечень логических групп микросервисов на 30.06.2025
+### Перечень логических групп (30.06.2025)
 
-| Название логической группы | Топик логов логической группы | Описание |
-|----------------------------|-------------------------------|----------|
-| base | \-microservices-logs.base | Микросервисы общего назначения; базовые |
-| integration | \-microservices-logs.integration | Микросервисы внешней интеграции |
-| security | \-microservices-logs.security | Микросервисы безопасности |
-| gateway | \-microservices-logs.gateway | Микросервисы шлюзов? |
+| Логическая группа | Топик логов | Описание |
+| --- | --- | --- |
+| base | `<contour>-microservices-logs.base` | Микросервисы общего назначения |
+| integration | `<contour>-microservices-logs.integration` | Микросервисы внешней интеграции |
+| security | `<contour>-microservices-logs.security` | Микросервисы безопасности |
+| gateway | `<contour>-microservices-logs.gateway` | Микросервисы шлюзов |
 
-### При появлении новой логической группы микросервисов
+### При появлении новой логической группы
 
-* Создать топик логов для новой логической группы микросервисов согласно формуле. Список параметров взять из уже имеющихся аналогичных топиков или с другого контура, на котором Kafka логов обладает схожими характеристиками
-* Выпустить сертификаты для Vector Log Agent для всех серверов, на которых будут располагаться микросервисы этой группы. При выпуске рекомендуется составлять CN по следующей формуле: `smgoz-<contour>-app-<group>-vector` (обсуждаемо).
-* Выдать права продьюсера `Write + Describe` на топик для Principal сертификатов из предыдущего пункта.
-* Выдать права консьюмера `Read + Describe` на топик для Principal сертификатов Vector OpenSearch, обслуживающих данный контур.
-* Выдать или удостовериться в наличии прав `Read + Describe` на консьюмергруппу `vector-consumer-<contour>-microservices-<group>-logs` для Principal сертификатов Vector OpenSearch, обслуживающих данный контур.
+- Создать топик логов по формуле (параметры взять из аналогичных топиков).
+- Выпустить сертификаты для Vector Log Agent на всех серверах группы. Рекомендуемый CN: `smgoz-<contour>-app-<group>-vector`.
+- Выдать права продьюсера `Write + Describe` на топик для Principal сертификатов Vector Agent.
+- Выдать права консьюмера `Read + Describe` на топик для Principal сертификатов Vector OpenSearch.
+- Выдать права `Read + Describe` на consumer group `vector-consumer-<contour>-microservices-<group>-logs`.
 
 ## OpenSearch
 
 ### Права
 
-Права на создание нового индекса у OpenSearch Vector отсуствуют - только на запись в уже существующие индексы.
+Vector OpenSearch имеет только права записи в существующие индексы (создание индексов запрещено).
 
-#### Пример контура ILT
-
-```plaintext
+```yaml
 opensearch_configuration_roles:
   app_vector:
     cluster_permissions:
@@ -52,11 +52,9 @@ opensearch_configuration_roles:
 
 ### Index Lifecycle Policy
 
-Необходимо убедиться, что новые индексы попадут под правильный Index Lifecycle Policy, которая обеспечивает своевременный rollover и удаление индексов на непродовых контурах.
+Убедитесь, что новые индексы попадают под правильную ILM/ISM-политику (rollover + удаление на непродовых контурах).
 
-#### Пример контура ILT
-
-```plaintext
+```yaml
 opensearch_configuration_policies:
   - name: "1g-rollover-indexes"
     policy:
@@ -85,19 +83,17 @@ opensearch_configuration_policies:
               delete: {}
           transitions: []
       ism_template:
-      - index_patterns:
-        - "ilt-infra-logs.*"
-        - "ilt-ms-logs.*"
-        priority: 1
+        - index_patterns:
+            - "ilt-infra-logs.*"
+            - "ilt-ms-logs.*"
+          priority: 1
 ```
 
 ### Index Policy Templates
 
-Для генерации Index Templates следует внести имена новых темплейтов в секцию `opensearch_configuration_rollover_index_template:` inventory, после чего прогнать роль `opensearch-configuration` начиная с версии `0.6.2`.
+Добавьте новые шаблоны в `opensearch_configuration_rollover_index_template` и прогоните роль `opensearch-configuration` (>= 0.6.2).
 
-#### Пример контура ILT
-
-```plaintext
+```yaml
 opensearch_configuration_rollover_index_template:
   - templates_list:
       - template_name: "ilt-ms-logs.base.smgoz-authorization-service"
@@ -120,41 +116,39 @@ opensearch_configuration_rollover_index_template:
 
 ### Алиасы и первичный индекс
 
-Формула наименования алиасов: `<contour>-ms-logs.<group>.<ms-name>`, где:
+Формула алиаса: `<contour>-ms-logs.<group>.<ms-name>`.
 
-* \- аббревиатура контура на проекте 100780 ИЗ СМ ГОЗ
-* \- название логической группы микросервиса
-* \- точное название контейнера микросервиса, без численного суффикса, определяющего конкретный экземпляр (если имеется)
+Первичный индекс: `<contour>-ms-logs.<group>.<ms-name>-000001`.
 
-Таким образом первичный индекс будет иметь имя: `<contour>-ms-logs.<group>.<ms-name>-000001`
+После применения Index Policy Templates:
 
-**После применения Index Policy Templates**
+- Индексы логов имеют численный суффикс.
+- Первичный индекс должен быть создан вручную (Vector OpenSearch не может создавать индексы).
+- Жизненный цикл регулируется ILM/ISM-политикой.
 
-* индексы логов для МС имеют численный суффикс
-* первичный индекс должен быть предсоздан, у Vector OpenSearch нет прав на создание индексов МС
-* жизненный цикл индексов, включая rollover, регулируется соответствующей Index Lifecycle Policy
-
-Для создания первичного индекса и alias для записи, необходимо прогнать плейбук `smgoz_opensearch_configuration` с тэгами `index_templates,create_rollover_index`.
+Для создания первичного индекса и alias выполните плейбук `smgoz_opensearch_configuration` с тегами `index_templates,create_rollover_index`.
 
 ### OpenSearch Dashboards
 
-Пользователи, имеющие права на просмотр индексов вольны создавать индекспаттерны OpenSearch Dashboards через раздел бокового меню `Dashboards Management -> Index Patterns` самостоятельно, как им удобно для работы.
+Пользователи с правами чтения могут создавать Index Patterns через `Dashboards Management -> Index Patterns`.
 
 ## Vector
 
-* Vector OpenSearch - сторона, принимающая сообщения из топиков Kafka, отправляющая документы в индексы OpenSearch
-* Vector Agent - сторона, принимающая события из JournalD, производящая склейку, парсинг и отправку сообщений в Kafka
+Термины:
+
+- **Vector OpenSearch** — получает сообщения из Kafka и пишет в OpenSearch.
+- **Vector Agent** — читает JournalD, парсит и отправляет события в Kafka.
 
 ### Vector OpenSearch
 
-В конфигурацию Vector OpenSearch должен быть добавлен инклюд шаблона файла конфигурации:
+Добавьте инклюд шаблона:
 
 ```yaml
 vector_custom_conf_list:
   - { name: "kafka_microservices_logs" }
 ```
 
-Шаблон должен быть параметризован следующим образом (на примере RTEST):
+Пример параметризации (RTEST):
 
 ```yaml
 template_kafka_microservices_logs:
@@ -187,14 +181,14 @@ template_kafka_microservices_logs:
 
 ### Vector Agent
 
-В конфигурацию Vector Agent должен быть добавлен инклюд шаблона файла конфигурации:
+Добавьте инклюд шаблона:
 
 ```yaml
 vector_custom_conf_list:
   - { name: "local_log_agent_v2" }
 ```
 
-Шаблон должен быть параметризован следующим образом (на примере ILT):
+Пример параметризации (ILT):
 
 ```yaml
 vector_template_vars:
@@ -205,10 +199,10 @@ vector_template_vars:
     siem_address: "ptsiem-sm-log1.headoffice.psbank.local:514"
 
     microservices_groups:
-    integration:
-      topic: "ilt-microservices-logs.integration"
-      microservices:
-        psb-smgoz-jvm-service-informaticaconnector: {}
-        smgoz-informatica-connector-service: {}
-        smgoz-mail-alert-service: {}
+      integration:
+        topic: "ilt-microservices-logs.integration"
+        microservices:
+          psb-smgoz-jvm-service-informaticaconnector: {}
+          smgoz-informatica-connector-service: {}
+          smgoz-mail-alert-service: {}
 ```

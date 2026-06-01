@@ -1,8 +1,12 @@
-Таблица логических групп и контуров, где они развернуты Таблица создана на основании group_vars
+# App vs Contour
+
+Таблица логических групп и контуров, где они развернуты. Данные сформированы на основании `group_vars`.
+
+**Легенда:** `:heavy_plus_sign:` — развернуто на контуре.
 
 | Group | dev | fiat | idev | ift | iift | ilt | ipreprod | itest | lt | preprod | rtest | stest | test | iprod | prod |
-|-------|-----|------|------|-----|------|-----|----------|-------|----|---------|-------|-------|------|-------|------|
-| api-gw |  |  |  |  | &#10133; | &#10133; | &#10133; | :heavy_plus_sign: |  |  |  |  |  | :heavy_plus_sign: |  |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| api-gw |  |  |  |  | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: |  |  |  |  |  | :heavy_plus_sign: |  |
 | app |  | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: |  |  |  | :heavy_plus_sign: | :heavy_plus_sign: |
 | app-ext | :heavy_plus_sign: |  | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: |  |  |  | :heavy_plus_sign: | :heavy_plus_sign: |
 | auth-provider |  |  | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: | :heavy_plus_sign: |  |  |  | :heavy_plus_sign: | :heavy_plus_sign: |
@@ -22,16 +26,16 @@
 | zookeeper-log |  |  |  |  |  |  | :heavy_plus_sign: |  |  |  | :heavy_plus_sign: | :heavy_plus_sign: |  | :heavy_plus_sign: |  |
 | zookeeper-shared |  |  |  |  |  | :heavy_plus_sign: |  |  | :heavy_plus_sign: |  |  |  |  |  | :heavy_plus_sign: |
 
-Таблица для WHITE_LIST
+## Whitelist
 
 | Group | Contour (no prod) | Contour (prod) |
-|-------|-------------------|----------------|
+| --- | --- | --- |
 | api-gw | iift, ilt, ipreprod, itest | iprod |
 | app | fiat, idev, ift, iift, ilt, ipreprod, itest, lt, preprod | iprod, prod |
-| app-ext | dev,idev, ift, iift, ilt, ipreprod, itest, lt, preprod | iprod, prod |
+| app-ext | dev, idev, ift, iift, ilt, ipreprod, itest, lt, preprod | iprod, prod |
 | auth-provider | idev, ift, iift, ilt, ipreprod, itest, lt, preprod | iprod, prod |
 | front-web | idev, ift, iift, ilt, ipreprod, itest, lt, preprod | iprod, prod |
-| kafka-app | dev,idev, ift, iift, ilt, ipreprod, itest, lt, preprod, test | iprod, prod |
+| kafka-app | dev, idev, ift, iift, ilt, ipreprod, itest, lt, preprod, test | iprod, prod |
 | kafka-log | ilt, ipreprod, lt, rtest, stest | iprod, prod |
 | loginom | itest |  |
 | monitoring | ilt, ipreprod, lt, rtest, stest | iprod, prod |
@@ -41,7 +45,7 @@
 | service-discovery | idev, ift, iift, ilt, ipreprod, itest, lt, preprod | iprod |
 | service-discovery-dba |  | iprod, prod |
 | storage | ilt, ipreprod, rtest, stest | iprod |
-| zookeeper-app | dev,idev, ift, iift, ipreprod, itest, preprod, test | iprod |
+| zookeeper-app | dev, idev, ift, iift, ipreprod, itest, preprod, test | iprod |
 | zookeeper-log | ipreprod, rtest, stest | iprod |
 | zookeeper-shared | ilt, lt | prod |
 

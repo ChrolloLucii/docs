@@ -1,159 +1,86 @@
-# **Инструкция по настройке оповещения Opensearch**
+# Настройка оповещений OpenSearch
 
-Перед исполнение заявки инициаторам следует напомнить, что Monitor в Opensearch не являются системой мониторинга и Opensource не несет ответственность за него. Сообщения от них необходимо воспринимать строго в информационном порядке
+!!! warning "Важно"
+		Monitor в OpenSearch не являются системой мониторинга, Opensource не несет ответственность за них. Сообщения следует воспринимать в информационном порядке.
 
-<table>
-<tr>
-<th>№</th>
-<th>Действие</th>
-<th>Ответственное подразделение</th>
-<th>Параметры</th>
-<th>Комментарий</th>
-</tr>
-<tr>
-<td>1</td>
-<td>Заказать ТУЗ для почтовой рассылки</td>
-<td>Сотрудник-инициатор задачи</td>
-<td>
+## 1. Заказать ТУЗ для почтовой рассылки
 
-Login
+- Ответственный: сотрудник-инициатор задачи.
+- Данные: логин и пароль ТУЗ.
+- Комментарий: после исполнения заявки ГУПД предоставляет логин/пароль.
 
-Password
-</td>
-<td>После исполнения заявки ГУПД предоставят логин/пароль ТУЗ</td>
-</tr>
-<tr>
-<td>2</td>
-<td>Настройка postfix</td>
-<td>ОАПЛ</td>
-<td>
+## 2. Настройка postfix
 
-Создаем файл с учетными данными /etc/postfix/sasl_passwd формата:
+- Ответственный: ОАПЛ.
+- Действия:
 
-* relay-int.psbank.ru   email:password
+```bash
+# /etc/postfix/sasl_passwd
+relay-int.psbank.ru email:password
 
-Выполняем команду
+postmap /etc/postfix/sasl_passwd
 
-* postmap /etc/postfix/sasl_passwd
-
-В конфиг postfix /etc/postfix/main.cf добавляем строки:
-
-* smtp_sasl_auth_enable = yes
-* smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
-* smtp_sasl_security_options = noanonymous
-
-5\. применяем конфиг
+# /etc/postfix/main.cf
+smtp_sasl_auth_enable = yes
+smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+smtp_sasl_security_options = noanonymous
 
 systemctl postfix reload
-</td>
-<td>
+```
 
-Организация доверия с почтовым сервером
+- Комментарий: организация доверия с почтовым сервером.
+- Заявка: [UTS-1952340](https://alm.headoffice.psbank.local/sd/operator/#uuid:GMtask$188524459:GMtask$PMsubivTask).
 
-[UTS-1952340](https://alm.headoffice.psbank.local/sd/operator/#uuid:GMtask$188524459:GMtask$PMsubivTask)
-</td>
-</tr>
-<tr>
-<td>3</td>
-<td>Opensearch - Notification/Email senders</td>
-<td>Opensource или Инициатор при наличии прав</td>
-<td>
+## 3. OpenSearch: Notification / Email senders
 
-Имя
+- Ответственный: Opensource или инициатор при наличии прав.
+- Параметры:
+	- Name
+	- Email address: ТУЗ (с @)
+	- Host: `127.0.0.1` (локальный postfix)
+	- Port: `25`
+	- Encryption method: `None`
+- Комментарий: от кого будут отправляться уведомления.
 
-Email address - ТУЗ (с @)
+## 4. OpenSearch: Notification / Email recipient groups
 
-Host - 127.0.0.1 - [localhost](http://localhost) указывается, так как передача сообщения будет через локальный postfix на сервере. У Opensearch нет возможности подключения к почтовому серверу с учетными данными
+- Ответственный: Opensource или инициатор при наличии прав.
+- Параметры: Name, Description, Emails.
+- Комментарий: кому будут отправляться уведомления.
 
-Port - 25 - Порт, на котором запущен локальный postfix.
+## 5. OpenSearch: Notification / Channels
 
-Encryption method - None
-</td>
-<td>От кого будут отправляться уведомления</td>
-</tr>
-<tr>
-<td>4</td>
-<td>Opensearch - Notification/Email recipient groups</td>
-<td>Opensource или Инициатор при наличии прав</td>
-<td>
+- Ответственный: Opensource или инициатор при наличии прав.
+- Параметры:
+	- Name и Description
+	- Channel Type: SMTP sender
+	- SMTP sender: из шага 3
+	- Default recipients: из шага 4
+- Комментарий: канал оповещений для Monitors.
 
-Name - Роль группы
+## 6. OpenSearch: Alerting / Monitors
 
-Description - Описание
+### 6.1 Для Opensource
 
-Emails - почтовые адреса сотрудников группы
-</td>
-<td>Кому будут отправляться уведомления</td>
-</tr>
-<tr>
-<td>5</td>
-<td>Opensearch - Notification/Chanells</td>
-<td>Opensource или Инициатор при наличии прав</td>
-<td>
+- Monitor type: _Per cluster metrics monitor_
+- Monitor defining method: любой удобный
+- Schedule: частота запуска запроса (Frequency, Run every)
+- Select data: имя кластера
+- Query: тип запроса
+- Triggers: имя триггера, уровень оповещения, условия
+- Actions: имя, канал из шага 5, тема и текст
 
-Name - подходящее по смыслу название канала
+Для передачи параметров из Query используйте шаблон `{{ctx.results.0.<имя_параметра>}}`.
 
-Description - подробное описание
+### 6.2 Для остальных подразделений
 
-Channel Type - SMTP sender
+- Monitor type: _Per cluster metrics monitor_
+- Monitor defining method: любой удобный
+- Schedule: частота запуска запроса (Frequency, Run every)
+- Select data: кластер, индекс, поле времени
+- Query: метрики, период, фильтр и группировка
+- Triggers: имя триггера, уровень оповещения, условия
+- Actions: имя, канал из шага 5, тема и текст
 
-SMTP sender - из пп.3
-
-Default recipients - из пп.4
-</td>
-<td>Канал оповещений, который будет подключаться на уровне Monitors</td>
-</tr>
-<tr>
-<td>6.1</td>
-<td>Opensearch - Alerting/Monitors (для Opensource)</td>
-<td>Opensource</td>
-<td>
-
-Monitor type - _Per cluster metrics monitor_
-
-Monitor defining methost - любой удобный
-
-Shedule - Частота запуска запроса (Frequency,Run every)
-
-Select data - имя кластера
-
-Query - Выбираем тип запроса
-
-Triggers - имя триггера, уровень оповещения, условия срабатывания
-
-Actions - Имя, канал из пп.5, Описание сообщение: тема и текст
-</td>
-<td>
-
-Чтобы передать в сообщении какие-либо параметры из запроса Query необходимо его вызвать по следующему шаблону - {{ctx.results.0.\<имя параметра\>}}
-</td>
-</tr>
-<tr>
-<td>6.2</td>
-<td>Opensearch - Alerting/Monitors (для остальных подразделений)</td>
-<td>Opensource или Инициатор при наличии прав</td>
-<td>
-
-Monitor type - _Per cluster metrics monitor_
-
-Monitor defining methost - любой удобный
-
-Shedule - Частота запуска запроса (Frequency,Run every)
-
-Select data - выбираем кластер, индекс, поле времени
-
-Query - Метрики, за какой промежуток времени собрать, фильтр и группировка
-
-Triggers - имя триггера, уровень оповещения, условия срабатывания
-
-Actions - Имя, канал из пп.5, Описание сообщение: тема и текст
-</td>
-<td>
-
-Пока не победил время.
-
-Opensearch dashboard игнорирует системное время и отображает его в UTC 0 в переменных {{ctx.periodStart }} и {{ctx.periodEnd }}
-</td>
-</tr>
-</table>
+OpenSearch Dashboards игнорирует системное время и отображает его в UTC 0 в переменных `{{ctx.periodStart}}` и `{{ctx.periodEnd}}`.
 

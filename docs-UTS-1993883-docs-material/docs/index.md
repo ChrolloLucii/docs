@@ -1,19 +1,27 @@
 # Домашняя
 
-## Аудит
+Документация по эксплуатации и организационной работе проекта СМ ГОЗ Opensource.
 
-- [APP EXT](home/Audit/AppExt)
-- [AUTH PROVIDER](home/Audit/AuthProvider)
-- [FRONT WEB](home/Audit/Front-Web)
-- [KAFKA APP](home/Audit/Kafka-app)
-- [LOGINOM](home/Audit/Loginom)
-- [OPENSEARCH](home/Audit/Opensearch)
-- [STORAGE](home/Audit/Storage)
-- [VECTOR ALL](home/Audit/VectorALL)
+## Быстрые действия
 
-## Полезные ссылки
+| Задача | Раздел |
+| --- | --- |
+| Проверить схему мониторинга | [Мониторинг](home/Monitoring.md) |
+| Обновить список задач | [Backlog](home/Backlog.md) |
+| Настроить оповещения OpenSearch | [OpenSearch: Мониторы](home/Opensearch/Monitors.md) |
+| Выполнить обновление кластера OpenSearch | [OpenSearch: Обновление](home/Opensearch/Обновление-кластера.md) |
+| Подключить X.509 в Keycloak | [Keycloak: X.509](home/Keycloak/X509-Authentication.md) |
+| Подключить логи микросервисов | [Vector: Logging v2](home/Vector/Logging-v2.md) |
 
-- [Monitoring](home/Monitoring)
-- [Backlog](home/Backlog)
-- [Дежурства](home/%D0%9E%D1%80%D0%B3%D0%A0%D0%B0%D0%B7%D0%B4%D0%B5%D0%BB/%D0%94%D0%B5%D0%B6%D1%83%D1%80%D1%81%D1%82%D0%B2%D0%B0)
-- [Группы_и_ТУЗ_Opensource](home/%D0%9E%D1%80%D0%B3%D0%A0%D0%B0%D0%B7%D0%B4%D0%B5%D0%BB/%D0%93%D1%80%D1%83%D0%BF%D0%BF%D1%8B_%D0%B8_%D0%A2%D0%A3%D0%97_Opensource)
+## Карта разделов
+
+- **База знаний** — мониторинг, backlog и практические заметки для команды.
+- **Эксплуатация** — инструкции по OpenSearch, Keycloak и Vector.
+- **Аудит** — согласования и отклонения по требованиям ИБ.
+- **Организация** — группы, ТУЗ и график дежурств.
+- **Шпаргалка** — частые команды и короткие инструкции.
+
+## Правила актуализации
+
+- Фиксируйте ссылку на заявку при изменении процесса.
+- Обновляйте документы до выполнения работ в контурах.

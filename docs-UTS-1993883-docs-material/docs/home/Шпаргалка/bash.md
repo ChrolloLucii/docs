@@ -1,39 +1,50 @@
-Convert cert to pem for VAULT
+# Bash: полезные рецепты
 
-```ini
-openssl x509 -inform der -in <certfile>.cer -out <certfile>.pem; done
+## Конвертация сертификата в PEM для Vault
+
+```bash
+openssl x509 -inform der -in <certfile>.cer -out <certfile>.pem
 ```
 
-MD5SUM
+## Проверка соответствия ключа и сертификата (MD5)
 
-```ini
-  openssl x509 -in ${cert} -noout -modulus | openssl md5
-  openssl rsa -in ${key} -noout -modulus | openssl md5
+```bash
+openssl x509 -in "${cert}" -noout -modulus | openssl md5
+openssl rsa -in "${key}" -noout -modulus | openssl md5
 ```
 
-COPY SSH-KEY
+## Копирование SSH ключа на список хостов
 
-```ini
-  hosts=
-  read -s pass; for hst in ${hosts}; do sshpass -p ${pass} ssh-copy-id $hst ;done
+```bash
+hosts=""
+read -s pass
+for hst in ${hosts}; do
+  sshpass -p "${pass}" ssh-copy-id "${hst}"
+done
 ```
 
-TELNET
+## Проверка TCP порта
 
-```ini
-  host=''
-  port=''
-  (echo >/dev/tcp/$host/$port) &>/dev/null && echo "open" || echo "close"
+```bash
+host=""
+port=""
+(echo >/dev/tcp/${host}/${port}) &>/dev/null && echo "open" || echo "close"
 ```
 
-AstraLinux Get URL
+## AstraLinux: запрос списка тегов
 
-```ini
-https_proxy=http://usrproxy.headoffice.psbank.local:8080 curl --proxy-negotiate -U : https://registry.red-soft.ru/v2/ubi7/ubi-minimal/tags/list -sk | jq
+```bash
+https_proxy=http://usrproxy.headoffice.psbank.local:8080 \
+  curl --proxy-negotiate -U : \
+  https://registry.red-soft.ru/v2/ubi7/ubi-minimal/tags/list -sk | jq
 ```
 
-Ldapsearch
-```ini
-ldapsearch -H "ldaps://headoffice.psbank.local:636" -D "headoffice\rybakovvd" \
- -W -b "DC=headoffice,DC=psbank,DC=local" "(&(objectCategory=user)(mail=khalaknyu*))
+## Ldapsearch
+
+```bash
+ldapsearch -H "ldaps://headoffice.psbank.local:636" \
+  -D "headoffice\rybakovvd" \
+  -W \
+  -b "DC=headoffice,DC=psbank,DC=local" \
+  "(&(objectCategory=user)(mail=khalaknyu*))"
 ```

@@ -87,35 +87,37 @@ markdown_extensions:
   - pymdownx.tilde
 
 nav:
-  - Главная: index.md
-  - Аудит:
-    - home/Audit/AppExt.md
-    - home/Audit/AuthProvider.md
-    - home/Audit/Front-Web.md
-    - home/Audit/Kafka-app.md
-    - home/Audit/Loginom.md
-    - home/Audit/Opensearch.md
-    - home/Audit/Storage.md
-    - home/Audit/VectorALL.md
-  - Мониторинг: home/Monitoring.md
-  - Backlog: home/Backlog.md
-  - Keycloak:
-    - home/Keycloak/X509-Authentication.md
-  - OpenSearch:
-    - home/Opensearch/Monitors.md
-    - home/Opensearch/Обновление-кластера.md
-  - Vector:
-    - home/Vector/Logging-v2.md
-  - Организация:
-    - home/ОргРаздел/Группы_и_ТУЗ_Opensource.md
-    - home/ОргРаздел/Дежурства.md
-  - Шпаргалка:
-    - home/Шпаргалка/AppVSContour.md
-    - home/Шпаргалка/bash.md
-    - home/Шпаргалка/ceph.md
-    - home/Шпаргалка/Consul.md
-    - home/Шпаргалка/kafka.md
-    - home/Шпаргалка/Opensearch.md
-    - home/Шпаргалка/Включить-репозиторий-latest.md
-    - home/Шпаргалка/Установка-intelliJ-IDEA-(RedOS).md
-    - home/Шпаргалка/Установка-postman-(RedOS).md
+  - ":material-home: Домашняя": index.md
+  - ":material-book: База знаний":
+      - Мониторинг: home/Monitoring.md
+      - Backlog: home/Backlog.md
+  - ":material-tools: Эксплуатация":
+      - OpenSearch:
+          - Мониторы и оповещения: home/Opensearch/Monitors.md
+          - Обновление кластера: home/Opensearch/Обновление-кластера.md
+      - Keycloak:
+          - X.509 аутентификация: home/Keycloak/X509-Authentication.md
+      - Vector:
+          - Логи микросервисов: home/Vector/Logging-v2.md
+  - ":material-check-circle: Аудит":
+      - APP EXT: home/Audit/AppExt.md
+      - AUTH PROVIDER: home/Audit/AuthProvider.md
+      - FRONT WEB: home/Audit/Front-Web.md
+      - KAFKA APP: home/Audit/Kafka-app.md
+      - LOGINOM: home/Audit/Loginom.md
+      - OPENSEARCH: home/Audit/Opensearch.md
+      - STORAGE: home/Audit/Storage.md
+      - VECTOR ALL: home/Audit/VectorALL.md
+  - ":material-account-group: Организация":
+      - Группы и ТУЗ: home/ОргРаздел/Группы_и_ТУЗ_Opensource.md
+      - Дежурства: home/ОргРаздел/Дежурства.md
+  - ":material-lightbulb-on: Шпаргалка":
+      - App VS Contour: home/Шпаргалка/AppVSContour.md
+      - Bash: home/Шпаргалка/bash.md
+      - Ceph: home/Шпаргалка/ceph.md
+      - Consul: home/Шпаргалка/Consul.md
+      - Kafka: home/Шпаргалка/kafka.md
+      - OpenSearch: home/Шпаргалка/Opensearch.md
+      - Репозиторий latest (RedOS): home/Шпаргалка/Включить-репозиторий-latest.md
+      - IntelliJ IDEA (RedOS): home/Шпаргалка/Установка-intelliJ-IDEA-(RedOS).md
+      - Postman (RedOS): home/Шпаргалка/Установка-postman-(RedOS).md
